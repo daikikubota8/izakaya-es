@@ -1,0 +1,234 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>カンテラゲージ(ES)ダッシュボード｜居酒屋業態</title>
+<style>
+*{box-sizing:border-box}body{font-family:"Hiragino Sans","Yu Gothic","Meiryo",sans-serif;margin:0;background:#f4f6f9;color:#222;font-size:13px}
+.top{position:sticky;top:0;z-index:20;box-shadow:0 2px 6px #0002}
+header{background:#1f3a5f;color:#fff;padding:12px 20px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+header h1{font-size:18px;margin:0;flex:1}.ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+select,button{font-size:13px;padding:5px 8px;border-radius:6px;border:1px solid #ccc}
+nav{display:flex;gap:4px;padding:8px 20px 0;background:#e3e8ef;overflow-x:auto;-webkit-overflow-scrolling:touch}
+nav button{border:none;border-radius:8px 8px 0 0;padding:8px 16px;background:#cfd8e3;cursor:pointer;white-space:nowrap;flex:0 0 auto}nav button.on{background:#fff;font-weight:bold}
+main{padding:14px 20px}.sec{display:none}.sec.on{display:block}
+.cards{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}.card{background:#fff;border-radius:10px;padding:10px 16px;box-shadow:0 1px 3px #0001;min-width:140px}.card b{font-size:22px;display:block}.card small{color:#666}
+.box{background:#fff;border-radius:10px;padding:12px;box-shadow:0 1px 3px #0001;margin-bottom:12px}
+h3{margin:0 0 8px;font-size:15px;border-left:4px solid #1f3a5f;padding-left:8px}
+table{border-collapse:separate;border-spacing:0;width:100%}th,td{border-right:1px solid #dde2ea;border-bottom:1px solid #dde2ea;padding:4px 5px;text-align:center;white-space:nowrap}th{background:#eef2f7;font-size:12px}
+td.n{text-align:left}tr.avg td{background:#1f3a5f;color:#fff;font-weight:bold}tr.area td{background:#e8eef7;font-weight:bold;text-align:left}
+.lo{background:#ffe9a8!important}.vlo{background:#f8c08f!important;font-weight:bold}.hi{color:#0a7a3d;font-weight:bold}
+.up{color:#0a7a3d}.dn{color:#c62828}.th-sort{cursor:pointer;text-decoration:underline dotted}.th-sort.cur{background:#d4e2f7}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.mvp{display:flex;gap:8px}.mvp>div{flex:1;background:#f7f9fc;border-radius:8px;padding:8px}.mvp ul{margin:4px 0 0;padding-left:16px;font-size:11px;color:#444}
+.legend span{display:inline-block;padding:2px 8px;margin-right:6px;border-radius:4px;font-size:11px}
+.bar{position:relative;height:14px;background:#eef1f5;border-radius:7px}.bar div{height:100%;border-radius:7px}.bar i{position:absolute;top:-3px;bottom:-3px;width:2px;background:#1f3a5f}.dt td{padding:7px 6px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 10px}.chips button{border:1px solid #c5d0de;background:#fff;border-radius:16px;padding:6px 12px;cursor:pointer}.chips button.on{background:#1f3a5f;color:#fff;border-color:#1f3a5f;font-weight:bold}.rk1{background:#fff7d6!important}.medal{display:inline-block;width:24px;height:24px;line-height:24px;border-radius:50%;background:#e3e8ef;font-weight:bold}.m1{background:#f5c542}.m2{background:#c9ced6}.m3{background:#d9a066}.mem{font-size:11px;color:#555;text-align:left;white-space:normal;min-width:200px}
+@media (max-width:700px){.chips{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch}.chips button{flex:0 0 auto}.mem{min-width:160px}}
+.qi{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;margin-left:3px;border-radius:50%;background:#1f3a5f;color:#fff;font-size:10px;font-weight:bold;cursor:pointer;vertical-align:middle;text-decoration:none}.chips button.on .qi{background:#fff;color:#1f3a5f}
+#qm{display:none;position:fixed;inset:0;background:#0006;z-index:100;align-items:center;justify-content:center;padding:16px}#qm.on{display:flex}.qbox{background:#fff;border-radius:10px;overflow:hidden;width:100%;max-width:440px;box-shadow:0 8px 30px #0004}.qh{padding:12px 14px;font-weight:bold;font-size:15px;position:relative}.qh small{font-weight:normal;font-size:11px}.qx{position:absolute;right:12px;top:6px;font-size:22px;cursor:pointer}.qr{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-bottom:1px solid #eee;font-size:13px;line-height:1.6;white-space:normal;text-align:left}.qr:nth-child(even){background:#f7f9fc}.qn{flex:0 0 22px;height:22px;border-radius:50%;text-align:center;line-height:22px;font-weight:bold;font-size:12px}
+.note{font-size:11px;color:#666;margin-top:6px}
+.tw{overflow:auto;max-height:72vh;-webkit-overflow-scrolling:touch;border-radius:6px;border-left:1px solid #dde2ea;border-top:1px solid #dde2ea}
+.tw th{position:sticky;top:0;z-index:3}
+.sk tr>*:nth-child(1){position:sticky;left:0;z-index:2;min-width:46px;width:46px}
+.sk tr:not(.avg):not(.area)>*:nth-child(2){position:sticky;left:46px;z-index:2;min-width:118px;box-shadow:2px 0 3px #0001}
+.sk1 tr>*:nth-child(1){position:sticky;left:0;z-index:2;box-shadow:2px 0 3px #0001}
+.sk tr:not(.avg):not(.area)>td:nth-child(-n+2),.sk1 td:first-child{background:#fff}
+.sk tr.avg>td:first-child{background:#1f3a5f}.sk tr.area>td:first-child{background:#e8eef7}
+.tw tr>th:nth-child(-n+2){z-index:4}
+a{color:#1e63d6;text-decoration:none;font-weight:bold}
+@media (max-width:700px){
+ body{font-size:12px}header{padding:8px 10px;gap:6px}header h1{font-size:15px;width:100%}
+ .ctl{width:100%;gap:6px}.ctl label{flex:1;display:flex;flex-direction:column;font-size:10px}.ctl select{width:100%;padding:6px}.ctl button{padding:8px 10px}
+ nav{padding:6px 8px 0}nav button{padding:9px 14px;font-size:13px}
+ main{padding:8px}.box{padding:8px;border-radius:8px}h3{font-size:14px}
+ .cards{display:grid;grid-template-columns:1fr 1fr;gap:6px}.card{min-width:0;padding:8px 10px}.card b{font-size:18px}.card small{font-size:10px;display:block;line-height:1.35}
+ .grid{grid-template-columns:1fr}.mvp{flex-direction:column}
+ th,td{padding:5px 4px;font-size:11px}th{font-size:10px;white-space:normal;min-width:44px}
+ .sk tr:not(.avg):not(.area)>*:nth-child(2){min-width:96px;max-width:96px;white-space:normal;font-size:11px}
+ .dt tr>*:nth-child(4),.dt tr>*:nth-child(7){display:none}.dt tr>*:nth-child(3){min-width:90px}.dt td{padding:8px 4px}
+ .tw{max-height:68vh}#ss{width:100%;padding:8px;font-size:14px}.box label{display:block}
+}
+
+
+/* ===== PDF/印刷 ===== */
+.ph{display:none}.ponly{display:none}body.pm .ponly{display:block}body.pm tr.px{display:none}
+body.pm .sec{display:none!important}body.pm .sec.pr{display:block!important;margin:0 auto;padding:0;background:#fff}
+body.pm .sec.pr .ph{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #1f3a5f;padding:0 0 4px;margin-bottom:6px}
+.ph b{font-size:18px;color:#1f3a5f}.ph span{font-size:11px;color:#555}
+body.pm .tw{max-height:none!important;overflow:visible!important;border:0}
+body.pm .tw th,body.pm .sk *,body.pm .sk1 *{position:static!important;box-shadow:none!important}
+body.pm .box,body.pm .card{box-shadow:none;border:1px solid #d5dbe4;margin-bottom:6px;padding:6px 8px}
+body.pm .cards{display:flex;flex-wrap:nowrap;gap:6px;margin-bottom:6px}body.pm .card{flex:1;min-width:0;padding:4px 8px}body.pm .card b{font-size:17px}
+body.pm th,body.pm td{padding:2px 4px;font-size:11px}body.pm .dt td{padding:4px}
+body.pm .grid{grid-template-columns:1fr 1fr;gap:6px}body.pm .mvp{flex-direction:row}
+body.pm .qi,body.pm .noprint,body.pm .th-sort{text-decoration:none}body.pm .qi,body.pm .noprint{display:none!important}
+body.pm .note{margin-top:3px;font-size:10px}body.pm h3{font-size:13px;margin-bottom:4px}
+body.pm #tend .tw td,body.pm #tend .tw th{padding:1px 3px;font-size:10px;line-height:1.25}body.pm #tend .grid .tw tr>*:nth-child(2){display:none}body.pm .tw table{width:100%}body.pm .chips{margin:2px 0 6px}body.pm .chips button:not(.on){display:none}
+body.pm .sec[data-o="L"]{page:land}body.pm .sec[data-o="P"]{page:port}
+@page land{size:A4 landscape;margin:7mm}@page port{size:A4 portrait;margin:7mm}@page{size:A4 landscape;margin:7mm}
+@media print{body{background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.top,#qm{display:none!important}main{padding:0!important}body.pm .sec.pr{break-after:page}body.pm .sec.pr:last-of-type{break-after:auto}}
+.pbtn{background:#fff;color:#1f3a5f;font-weight:bold}
+</style></head><body>
+<div class="top"><header><h1>カンテラゲージ（ES）ダッシュボード｜居酒屋業態</h1>
+<div class="ctl"><label>対象月 <select id="month"></select></label><label>比較月 <select id="cmp"></select></label>
+<button class="pbtn" onclick="printTabs([curTab()])">このページをPDF</button><button onclick="printTabs(TABS)">全ページPDF</button></div></header>
+<nav><button data-t="sum" class="on">全体サマリー</button><button data-t="area">エリア別</button><button data-t="store">店舗詳細</button><button data-t="tend">傾向</button><button data-t="trend">推移比較</button><button data-t="arank">エリアランキング</button></nav></div>
+<main><div id="sum" class="sec on"></div><div id="area" class="sec"></div><div id="store" class="sec"></div><div id="tend" class="sec"></div><div id="trend" class="sec"></div><div id="arank" class="sec"></div></main><div id="qm" onclick="hideQ()"></div>
+<script>
+const ITEMS=["人間関係","環境","教育","理念浸透","ルール","成長・やりがい","リファラル","クオリティ","サービス","クリンリネス"];
+const AREAS={"塩入エリア": ["焼売のジョー野毛", "焼売のジョー川崎"], "岸本エリア": ["焼売のジョー町田", "焼売のジョー大宮", "焼売のジョー大阪駅前第三ビル"], "村上エリア": ["焼売のジョー歌舞伎町", "焼売のジョー錦糸町", "焼売のジョー千葉", "焼売のジョー立川"], "菅野エリア": ["焼売のジョー八王子", "焼売のジョー多摩センター"], "徳永エリア": ["魚の登竜門 すしショップ百太郎"], "野口エリア": ["金目樽 溝の口"]};
+// s:[総合,(全社順位・非表示),回答率,10項目...]
+const DATA={
+"2026-04":{stores:{
+"焼売のジョー川崎":{s:[72, 68, 50, 69, 69, 74, 73, 76, 72, 69, 72, 74, 72],l:[["菅野 蒼成", 2], ["坂本 琴美", 2], ["西川 琴海", 1]],L:[["菅野 蒼成", 5, "率先して動き指示も丁寧／教え方・仕事が丁寧で慕われている／声が出ていて色々な仕事をこなせる"], ["葉坂 未来", 1, "仕事が早くて正確"], ["湊 ひなり", 1, "わからないことを教えてくれる"]]},
+"焼売のジョー多摩センター":{s:[88, 9, 35, 98, 81, 92, 79, 93, 99, 99, 73, 91, 73],l:[["眞島 はな", 3], ["見山 琴美", 3]],L:[["奥村 亮太", 2, "ホールもキッチンもこなしながら指示を出す／ホールの指示出し"], ["両角 駿", 2, "コミュニケーションをとろうとしている／周りが見えている"], ["鈴木 一心", 1, "圧倒的コミュニケーション能力とフレンドリーさ"]]},
+"焼売のジョー町田":{s:[73, 65, 21, 69, 67, 70, 78, 78, 71, 64, 74, 81, 79],l:[["税所 この香", 4], ["庄子 凛", 2], ["瓜田 まあい", 2]],L:[["長田 雄樹", 6, "なんでも教えてくれる／歴が長く助言が的確／視野が広く的確な指示"], ["庄子 凛", 2, "初回に色々教えてくれた／仕事ができて的確"], ["井沢 百寧", 1, "ホールで周りを上手く使っている"]]},
+"焼売のジョー大宮":{s:[61, 79, 19, 73, 51, 61, 52, 74, 54, 65, 60, 60, 63],l:[["吉川 のぞみ", 2], ["齊藤 菜摘", 1], ["河野 響", 1]],L:[["河野 響", 4, "全ポジ対応し周りを把握してフォロー／進んで仕事をする／一番信用できる"], ["久保田 響", 1, "声が大きい"]]},
+"焼売のジョー立川":{s:[83, 26, 55, 88, 83, 82, 81, 87, 83, 76, 83, 84, 83],l:[["伊東 愛", 5], ["小嶋 紗矢", 2], ["大室 茉唯", 2]],L:[["小嶋 紗矢", 6, "時間管理ができ指示できる／指示をくれる／周りが見えている"], ["佐相 実咲", 3, "他のバイトに声掛けしている／指示出しが的確"], ["向山 優菜", 1, "丁寧に沢山教えてくれる"]]},
+"焼売のジョー歌舞伎町":{s:[65, 76, 55, 75, 55, 68, 71, 68, 61, 44, 74, 76, 62],l:[["中野 香咲", 4], ["前川 瑞稀", 2]],L:[["西原 吏輝", 5, "歴が一番長く最年長で指示が的確／広い視野で的確な指示"], ["渡邊 智紀", 1, "指示出しができ、周りを見て判断・行動している"]]},
+"焼売のジョー錦糸町":{s:[86, 15, 100, 93, 83, 88, 84, 88, 89, 85, 74, 85, 89],l:[["鄭 煥", 6], ["内海 南音", 3], ["斎藤 稜生", 1]],L:[["内海 南音", 5, "周りを見て的確な指示／意見をはっきり言える／人を動かす立ち回り"], ["望月 玲央", 3, "明るい／長年の歴がある"], ["藤木 麗央", 1, "全体を見て指示を出せていた"]]},
+"焼売のジョー大阪駅前第三ビル":{s:[85, 18, 47, 91, 75, 87, 81, 91, 85, 86, 85, 79, 89],l:[["川端 楓", 3], ["姫野 舞", 3], ["田代 玲香", 2]],L:[["姫野 舞", 5, "周りを見て適切な指示／清潔を保つ声掛けもしてくれる"], ["田代 玲香", 2, "ホール・キッチン共にレベルが高い／理由をつけて教えてくれる"], ["川端 楓", 1, "無駄なくこなし聞きやすい／こちらの動きを見てくれている"]]},
+"焼売のジョー野毛":{s:[77, 53, 38, 93, 75, 77, 74, 84, 72, 63, 62, 78, 88],l:[["吉田 航汰", 3], ["岡村 彩美", 1], ["坂本 寧斗", 1]],L:[["吉田 航汰", 3, "相談する人が多い／オールラウンダー／決定力がある"], ["藤谷 歩瑠照", 1, "指示の出し方・タイミングが上手"], ["岡村 彩美", 1, "お店のことを考えられている"]]},
+"焼売のジョー八王子":{s:[74, 63, 40, 85, 73, 69, 68, 80, 75, 70, 69, 70, 82],l:[["酒井 伊織", 5], ["福澤 光梨", 2], ["安齊 恭吾", 1]],L:[["小関 修生", 5, "人を選ばず指示できる／キッチンからでもホールへ的確な指示"], ["安齊 恭吾", 2, "よくシフトに入っている／引き継ぎや伝達が端的でお客様対応も良い"], ["酒井 伊織", 1, "能力値"]]},
+"焼売のジョー千葉":{s:[87, 10, 90, 88, 86, 89, 87, 87, 89, 88, 82, 85, 88],l:[["岩澤 真奈", 4], ["井野口 奈南", 2], ["松下 明日香", 1]],L:[["井野口 奈南", 8, "指示が的確／仕事を全体的に把握し率先して業務をこなす"], ["松下 明日香", 1, "頼れる"]]},
+"魚の登竜門 すしショップ百太郎":{s:[78, 50, 100, 83, 75, 78, 76, 83, 76, 69, 78, 82, 76],l:[["大場 実子", 4], ["新島 幹史", 4], ["齋藤 栞", 2]],L:[["齋藤 栞", 8, "席の回転や開店準備でアルバイトに指示／全体への声掛け"], ["新島 幹史", 3, "社員の意見をくみ取り率先して行動／考えて仕事を回す"], ["大場 実子", 2, "ホールの連携が取れている／時間管理ができいつも笑顔"]]},
+"金目樽 溝の口":{s:[64, 78, 47, 73, 66, 67, 58, 69, 66, 56, 63, 61, 59],l:[["佐々木 美詩", 4], ["浜西 亮輔", 3], ["田中 海咲", 2]],L:[["浜西 亮輔", 9, "リーダー感がある／冷静／シフトが多い"]]}
+}},
+"2026-07":{stores:{
+"焼売のジョー川崎":{s:[76, 65, 46, 73, 79, 79, 76, 73, 78, 77, 74, 73, 77],l:[["渡邊 凛", 3], ["湊 ひなり", 1], ["菅野 蒼成", 1]],L:[["菅野 蒼成", 3, "店全体を見て周りを引っ張る／気遣いができ全ポジション高水準／指示出しと優先順位を理解"], ["湊 ひなり", 1, "率先して仕事に向き合えている"], ["坂本 琴美", 1, "テキパキしていてみんなのお手本"]]},
+"焼売のジョー多摩センター":{s:[85, 22, 76, 92, 77, 88, 83, 90, 86, 87, 78, 88, 78],l:[["眞島 はな", 9], ["見山 琴美", 4], ["酒井 有", 1]],L:[["両角 駿", 10, "キッチンとホールの状況を判断して指示／先輩後輩関係なく雰囲気づくり／他ポジションも気にかけ安心感"], ["眞島 はな", 2, "頼れる／新人教育含めテキパキ"], ["奥村 亮太", 2, "一番話しやすい／雰囲気"]]},
+"焼売のジョー町田":{s:[73, 78, 72, 79, 69, 73, 73, 76, 70, 70, 73, 76, 70],l:[["税所 この香", 9], ["庄子 凛", 3], ["村松 覚稀", 3]],L:[["長田 雄樹", 20, "指示を出せる／バッシングなど働き方を教えてくれた／様々な人に指示"], ["庄子 凛", 9, "テキパキと指示／どのポジションでも輝き指示出しも的確"], ["永井 蘭菜", 1, "元気になる"]]},
+"焼売のジョー大宮":{s:[77, 60, 77, 86, 76, 76, 74, 79, 78, 78, 73, 75, 74],l:[["森下 樹莉", 10], ["宮澤 瑛", 4], ["村林 夕空", 3]],L:[["河野 響", 12, "仕事ができ周りをよく見ている／指示や注意をしてくれる／キッチンもホールも教えてくれる"], ["宮澤 瑛", 5, "引っ張る力がある／率先してみんなを引っ張る"], ["久保田 響", 3, "オーラがある／やるべき事をハッキリ伝えられる"]]},
+"焼売のジョー立川":{s:[74, 75, 89, 79, 70, 72, 74, 76, 73, 69, 73, 76, 79],l:[["伊東 愛", 8], ["大室 茉唯", 4], ["百瀬 望花", 2]],L:[["向山 優菜", 7, "周りが見えている／経験があり優しく賢い／お客様第一の行動"], ["佐相 実咲", 6, "いつも的確な指示／歴が長く出勤が多い"], ["伊東 愛", 1, "明るく店を盛り上げ、仕事も真面目"]]},
+"焼売のジョー歌舞伎町":{s:[82, 40, 80, 90, 84, 81, 82, 86, 87, 75, 78, 81, 77],l:[["中野 香咲", 6], ["西村 涼平", 2], ["中村 海斗", 2]],L:[["中野 香咲", 8, "仕事ができる／各業務の精度が高い"], ["西原 吏輝", 3, "指示が的確で店が円滑に動く／元気で周りを見て気を使った言動"], ["中村 海斗", 1, "親切で気さく、一緒に働きやすい"]]},
+"焼売のジョー錦糸町":{s:[87, 9, 100, 95, 83, 89, 86, 91, 87, 85, 81, 87, 89],l:[["斎藤 稜生", 5], ["鄭 煥", 3], ["金田 依旺奈", 2]],L:[["内海 南音", 5, "全体を見て今すべきことを考える／周りを見て行動し信頼がある"], ["近藤 早姫", 5, "いろいろ教えてくれる／分かりやすく細かい指示"], ["金田 依旺奈", 2, "新人から見て優しく頼りがいがある"]]},
+"焼売のジョー大阪駅前第三ビル":{s:[82, 38, 83, 85, 76, 86, 79, 88, 80, 79, 77, 84, 88],l:[["田代 玲香", 11], ["姫野 舞", 3], ["川端 楓", 1]],L:[["田代 玲香", 8, "指示出しが的確／困っている人をサポートしチームをまとめる／ホールとキッチンを助ける"], ["姫野 舞", 7, "リーダー感がある／柔軟に指示を出している"]]},
+"焼売のジョー野毛":{s:[76, 64, 74, 77, 74, 79, 78, 77, 69, 59, 77, 80, 90],l:[["久堀 悠里亜", 5], ["坂本 寧斗", 4], ["髙田 藍寧", 2]],L:[["岡村 彩美", 11, "業務を熟知し周りを見て的確な指示／他スタッフへの気配り／周りを巻き込み店を良くする"], ["髙田 藍寧", 1, "頑張っている"], ["藤谷 歩瑠照", 1, "仕事ができる"]]},
+"焼売のジョー八王子":{s:[78, 58, 57, 87, 75, 79, 76, 77, 77, 78, 76, 75, 75],l:[["福澤 光梨", 5], ["酒井 伊織", 5], ["安齊 恭吾", 2]],L:[["小関 修生", 6, "人を選ばず指示できる／ホール・キッチンへの指示が的確で周りが見えている"], ["酒井 伊織", 3, "入りたての時に教えてくれた／歴が長く色々なポジションで活躍"], ["安齊 恭吾", 3, "接客態度が良く新人にも教えながら指示をくれる"]]},
+"焼売のジョー千葉":{s:[87, 12, 100, 93, 86, 90, 82, 87, 88, 90, 78, 83, 92],l:[["井野口 奈南", 5], ["松下 明日香", 3], ["小長井 菜月", 1]],L:[["井野口 奈南", 6, "リーダーシップがある／優しく教え仕事を積極的にやらせてくれる"], ["松下 明日香", 4, "混んでいる時に優しくサポート／責任感が強く率先して仕事"], ["加藤 来夢", 1, "次にやって欲しいことを教えてくれる"]]},
+"魚の登竜門 すしショップ百太郎":{s:[78, 57, 78, 84, 78, 78, 78, 78, 79, 78, 73, 79, 75],l:[["大場 実子", 7], ["新島 幹史", 4], ["齋藤 栞", 1]],L:[["新島 幹史", 8, "声がよく通り団体予約も臨機応変に対応／一番周りを見て行動／ホール・キッチンで存在感"], ["齋藤 栞", 5, "委員長タイプ／時間管理などアルバイト同士で情報共有"], ["斉藤 花奈", 1, "分からない時に指示を出してくれる"]]},
+"金目樽 溝の口":{s:[82, 34, 72, 88, 80, 82, 83, 85, 81, 80, 80, 83, 81],l:[["飯塚 鉄平", 7], ["浜西 亮輔", 4], ["上 優", 4]],L:[["浜西 亮輔", 11, "なんでも知っている／最も仕事ができる"], ["上 優", 4, "周りをよく見ている／新人スタッフにも自ら教えている"], ["清水 翔", 1, "ホールを手伝い、先出しなどを教えてくれる"]]}
+}},
+"2026-10":{stores:{
+"焼売のジョー川崎":{s:[81, 51, 100, 81, 77, 85, 81, 83, 76, 82, 81, 80, 79],l:[["菅野 蒼成", 7], ["渡邊 凛", 3], ["望月 萌叶", 1]],L:[["木村 圭吾", 6, "手が空いたら他の仕事も率先／バイトリーダー／教え方が分かりやすく気遣いがある"], ["菅野 蒼成", 3, "テキパキ動いている／周りの状況を常に把握"], ["湊 ひなり", 2, "声掛けや指示出し／勤務歴が長く責任感が強い"]]},
+"焼売のジョー多摩センター":{s:[84, 29, 100, 90, 79, 85, 81, 88, 86, 81, 79, 88, 78],l:[["眞島 はな", 9], ["見山 琴美", 4], ["奥村 亮太", 2]],L:[["両角 駿", 13, "リードしてくれる／キッチンとホールを把握して指示／仕事がはやい"], ["奥村 亮太", 4, "新人スタッフへの指示"], ["眞島 はな", 1, "次世代を担ってくれる人"]]},
+"焼売のジョー町田":{s:[75, 74, 81, 80, 73, 74, 72, 79, 74, 72, 74, 75, 73],l:[["税所 この香", 7], ["庄子 凛", 6], ["山家 昌悟", 3]],L:[["庄子 凛", 15, "グループLINEを活用してみんなを動かす／ミーティングでも周りをまとめる"], ["山家 昌悟", 8, "バイトリーダーとして積極的に動けている"], ["長田 雄樹", 7, "的確な指示と明確な改善策をくれる"]]},
+"焼売のジョー大宮":{s:[79, 56, 96, 86, 81, 79, 75, 83, 82, 75, 74, 79, 71],l:[["森下 樹莉", 9], ["河野 響", 3], ["旅河 花", 2]],L:[["河野 響", 15, "なんでもできる／指示をたくさん出す／ホールからキッチンまでよく見ている"], ["久保田 響", 5, "しっかり指示できている"], ["渡邉 優菜", 2, "教えてくれる／はっきり言え協調性がある"]]},
+"焼売のジョー立川":{s:[76, 69, 83, 84, 77, 74, 74, 80, 78, 65, 74, 77, 79],l:[["伊東 愛", 9], ["百瀬 望花", 2], ["大室 茉唯", 2]],L:[["佐相 実咲", 7, "長く働いている／やって欲しいことを的確に伝える／周りがよく見えている"], ["向山 優菜", 5, "責任感がある／在籍歴が長く頼りになる"], ["百瀬 望花", 2, "周りが見えている／指示出しもし積極的に動く"]]},
+"焼売のジョー歌舞伎町":{s:[85, 23, 92, 91, 86, 86, 85, 88, 85, 79, 81, 83, 81],l:[["中野 香咲", 9], ["阪口 美羽", 1], ["佐藤 将", 1]],L:[["中野 香咲", 5, "一番古株で頼りにされている／業務の幅・クオリティが高い"], ["西村 涼平", 3, "仕事をしっかりしている／シフトに多く出ている"], ["西原 吏輝", 2, "元気があり周りも良く見えている／歴が長い"]]},
+"焼売のジョー錦糸町":{s:[91, 3, 93, 98, 92, 91, 89, 91, 90, 89, 84, 90, 93],l:[["内海 南音", 4], ["斎藤 稜生", 3], ["鄭 煥", 2]],L:[["内海 南音", 9, "周りをよく見ている／バイトリーダーとして店を引っ張る発言が多い"], ["近藤 早姫", 5, "的確な指示／忙しい時でも周りを見て指示を出す"]]},
+"焼売のジョー大阪駅前第三ビル":{s:[81, 49, 64, 81, 70, 80, 84, 81, 80, 77, 84, 81, 90],l:[["田代 玲香", 6], ["姫野 舞", 1]],L:[["田代 玲香", 4, "指示出ししながら自分の仕事もしっかり／ホールからキッチンまで頑張る"], ["姫野 舞", 3, "みんなに指示を出す／店舗ルールを把握して守る"]]},
+"焼売のジョー野毛":{s:[83, 34, 85, 89, 83, 85, 82, 90, 82, 80, 75, 80, 83],l:[["岡村 彩美", 5], ["平川 絵鯉子", 3], ["田村 蓮", 1]],L:[["岡村 彩美", 9, "指示を出す／他の人にも仕事を振る／新人教育や丁寧に教えてくれる"], ["髙田 藍寧", 2, "指示を出す／自分で考えて周りに提案する"]]},
+"焼売のジョー八王子":{s:[75, 73, 100, 78, 75, 73, 74, 83, 74, 69, 74, 77, 73],l:[["福澤 光梨", 7], ["酒井 伊織", 5], ["小野塚 晃琉", 2]],L:[["酒井 伊織", 9, "率先して仕事ができる／ミーティングでもみんなをまとめる／周りが見えている"], ["小関 修生", 5, "指示が的確で社員顔負けの仕事をこなす"], ["相澤 恵太", 1, "視野が広く周りが見えている"]]},
+"焼売のジョー千葉":{s:[88, 9, 100, 92, 89, 88, 88, 92, 85, 88, 84, 86, 90],l:[["井野口 奈南", 6], ["大友 うらら", 1], ["梅岡 花奈", 1]],L:[["井野口 奈南", 6, "教え方が分かりやすくフレンドリー／ミーティングでも意見を出す／どのポジションもできる"], ["大友 うらら", 2, "頼りになる／新人に教えながら周りをフォロー"]]},
+"魚の登竜門 すしショップ百太郎":{s:[85, 22, 93, 91, 84, 88, 84, 85, 82, 83, 78, 87, 84],l:[["大場 実子", 6], ["髙橋 美月", 4], ["末水 陽奈", 2]],L:[["新島 幹史", 10, "リーダーはこの人しかいない／指示をよく出す／トラブルにも冷静に対処"], ["齋藤 栞", 2, "声出しを率先／困っている時に助けてくれる"], ["髙橋 美月", 2, "いつも元気／仕事への意識が高い"]]},
+"金目樽 溝の口":{s:[88, 10, 57, 93, 86, 88, 88, 92, 87, 90, 85, 88, 83],l:[["上 優", 4], ["浜西 亮輔", 3], ["清水 翔", 3]],L:[["浜西 亮輔", 7, "指示を出している／優しく教えてくれる／社員不在時に指示"], ["上 優", 4, "自分から積極的に行動している"], ["畑田 芽育", 1, "ドリンクスター"]]}
+}}
+};
+
+const QS={"人間関係":["#f2d64b",["あなたの上司は、あなたと仕事に必要なコミュニケーションが取れていますか？","あなたは、自店舗の社員を信頼・尊敬し、成長させてもらえていますか？","あなたは、自店舗の店長を信頼・尊敬し、成長させてもらえていますか？","あなたは、自店舗のエリアマネージャーを信頼・尊敬し、成長させてもらえていますか？"]],
+"環境":["#b3c3ef",["あなたは今の仕事に対しての報酬に満足していますか？","あなたのお店では、MTG、面談などで自分の意見を出すことができてますか？","あなたのお店は、職場環境の改善に取り組んでいますか？"]],
+"教育":["#b7dde6",["あなたのお店には、しっかりした教育の制度・体制がありますか？","あなたに対して適切な指導・教育をおこなっていますか？","あなたやお店のメンバーは、良い行動や発言をした人に対して「褒め」ていますか？"]],
+"理念浸透":["#f0aaa6",["お店のメンバーは、経営理念や店舗目標に対して行動できてますか？","あなたは経営理念や店舗目標に対して行動できてますか？"]],
+"ルール":["#a9d6b4",["あなたやお店のメンバーは、決めた事やルールを守れていますか？","あなたやお店のメンバーは、ルールに対して注意をし合っていますか？"]],
+"成長・やりがい":["#f2c14e",["あなたはこの会社を通じて、成長できていると感じますか？","あなたは、今の仕事にやりがいを感じますか？","あなたは、今の仕事に楽しさを感じますか？"]],
+"リファラル":["#9cc96b",["今働いているお店で、これからも働き続けたいと思いますか？","お仕事(アルバイト)を探している友人、知人に、お店を紹介したいと思いますか？"]],
+"クオリティ":["#f29a92",["あなたのお店の料理・商品のクオリティは何点ですか？","あなたのお店ではお客様に料理・商品をお待たせすることはないですか？"]],
+"サービス":["#86c27a",["お店のメンバーからは、お客様に喜んでもらいたいという気持ちが感じられますか？","あなたのお店の接客・サービスは何点ですか？"]],
+"クリンリネス":["#d3a8d8",["あなたのお店の店内はしっかり清掃はされていますか？","あなたのお店はしっかり整理整頓されていますか？"]]};
+const QI=n=>QS[n]?`${n}<span class="qi" data-q="${n}">?</span>`:n;
+const LQ=k=>QI(LAB(k));
+function showQ(n){const[c,q]=QS[n];$("qm").innerHTML=`<div class="qbox" onclick="event.stopPropagation()"><div class="qh" style="background:${c}">${n} <small>(${q.length}問)</small><span class="qx" onclick="hideQ()">×</span></div>${q.map((s,i)=>`<div class="qr"><span class="qn" style="background:${c}">${i+1}</span>${s}</div>`).join("")}</div>`;$("qm").classList.add("on")}
+function hideQ(){$("qm").classList.remove("on")}
+document.addEventListener("click",e=>{const q=e.target.closest(".qi");if(q){e.stopPropagation();e.preventDefault();showQ(q.dataset.q)}},true);
+document.addEventListener("keydown",e=>{if(e.key=="Escape")hideQ()});
+
+const months=Object.keys(DATA).sort();const $=id=>document.getElementById(id);
+const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;const f1=v=>v==null?"-":(Math.round(v*10)/10).toFixed(1);
+const KEYS=[0,2,...ITEMS.map((_,i)=>i+3)];const LAB=k=>k==0?"総合":k==2?"回答率":ITEMS[k-3];
+function stats(m){const st=DATA[m].stores,names=Object.keys(st),av={};KEYS.forEach(i=>av[i]=avg(names.map(n=>st[n].s[i])));
+ const rankBy=k=>{const o={};names.forEach(n=>o[n]=1+names.filter(x=>st[x].s[k]>st[n].s[k]).length);return o};
+ const rk=[...names].sort((a,b)=>st[b].s[0]-st[a].s[0]);return{st,names,av,rk,rankBy,inR:rankBy(0)}}
+function cls(v,a){if(a==null)return"";const d=v-a;return d<=-5?"vlo":d<0?"lo":d>=5?"hi":""}
+function diff(v,p){if(p==null)return'<span style="color:#aaa">-</span>';const d=Math.round((v-p)*10)/10;return d>0?`<span class="up">▲${d}</span>`:d<0?`<span class="dn">▼${-d}</span>`:"±0"}
+function areaOf(n){for(const a in AREAS)if(AREAS[a].includes(n))return a;return"未分類"}
+const legend=`<div class="legend"><span class="lo">平均未満</span><span class="vlo">平均-5pt以下</span><span class="hi">平均+5pt以上</span> ※ブランド平均・ブランド順位は送付分の焼売のジョー・魚の登竜門・金目樽 店舗のみで算出</div>`;
+const cur=()=>$("month").value,cmpM=()=>$("cmp").value;
+let sortKey=0;
+function head(){return`<tr><th>ブランド順位<br><small>${LAB(sortKey)}</small></th><th>店舗</th><th>エリア</th>${KEYS.map(k=>`<th class="th-sort ${k==sortKey?"cur":""}" onclick="sortKey=${k};render()">${LQ(k)}</th>`).join("")}</tr>`}
+function row(n,S,P){const RK=S.rankBy(sortKey),s=S.st[n].s,p=P&&P.st[n]?P.st[n].s:null;
+ return`<tr><td><b>${RK[n]}</b></td><td class="n"><a href="#" onclick="openStore('${n}');return false">${n}</a></td><td>${areaOf(n).replace("エリア","")}</td>${KEYS.map(k=>`<td class="${cls(s[k],S.av[k])}">${k==0?"<b>":""}${s[k]}${k==2?"%":""}${k==0?"</b>":""}<br><small>${diff(s[k],p&&p[k])}</small></td>`).join("")}</tr>`}
+function avgRow(lbl,S,names){return`<tr class="avg"><td colspan="3">${lbl}</td>${KEYS.map(k=>`<td>${f1(avg(names.map(n=>S.st[n].s[k])))}${k==2?"%":""}</td>`).join("")}</tr>`}
+function renderSum(S,P){const n=S.names.length,best=S.rk[0],worst=S.rk[n-1];const ia=ITEMS.map((t,i)=>[t,S.av[i+3]]).sort((a,b)=>a[1]-b[1]);
+ const sorted=[...S.names].sort((a,b)=>S.st[b].s[sortKey]-S.st[a].s[sortKey]);
+ $("sum").innerHTML=`<div class="cards"><div class="card"><small>対象店舗数</small><b>${n}店舗</b></div><div class="card"><small>ブランド平均（総合）</small><b>${f1(S.av[0])}点</b>${P?`<small>前回 ${f1(P.av[0])} ${diff(S.av[0],P.av[0])}</small>`:""}</div><div class="card"><small>ブランド平均回答率</small><b>${f1(S.av[2])}%</b></div><div class="card"><small>ブランド1位</small><b>${S.st[best].s[0]}点</b><small>${best}</small></div><div class="card"><small>ブランド最下位</small><b>${S.st[worst].s[0]}点</b><small>${worst}</small></div><div class="card"><small>平均が最も低い項目</small><b>${QI(ia[0][0])}</b><small>${f1(ia[0][1])}点 / 次点 ${ia[1][0]} ${f1(ia[1][1])}点</small></div></div>
+ <div class="box"><h3>店舗別スコア一覧（${cur()}${P?` ／ 比較：${cmpM()}`:""}）</h3>${legend}<div class="tw sk"><table>${head()}${avgRow("ブランド平均",S,S.names)}${sorted.map(x=>row(x,S,P)).join("")}</table></div><div class="note">見出し（総合・回答率・各項目）タップで並び替え・ブランド順位が切り替わります。各セル下段は前回比。</div></div>`}
+function renderArea(S,P){let h=`<div class="box"><h3>エリア別スコア（${cur()}）</h3>${legend}<div class="tw sk"><table>${head()}${avgRow("ブランド平均",S,S.names)}`;
+ const g0={};S.names.forEach(n=>(g0[areaOf(n)]=g0[areaOf(n)]||[]).push(n));
+ Object.keys(AREAS).concat(["未分類"]).forEach(a=>{const g=g0[a];if(!g)return;g.sort((x,y)=>S.st[y].s[sortKey]-S.st[x].s[sortKey]);const ga=k=>avg(g.map(n=>S.st[n].s[k]));
+  h+=`<tr class="area"><td colspan="3">${a}（${g.length}店舗）平均</td>${KEYS.map(k=>`<td class="${cls(ga(k),S.av[k])}">${f1(ga(k))}${k==2?"%":""}</td>`).join("")}</tr>`+g.map(x=>row(x,S,P)).join("")});
+ const miss=Object.values(AREAS).flat().filter(n=>!S.st[n]);
+ $("area").innerHTML=h+`</table></div><div class="note">見出しタップでエリア内の並び順とブランド順位が切り替わります。</div>${miss.length?`<div class="note">データ未登録：${miss.join("、")}</div>`:""}</div>`}
+let selStore=null;function openStore(n){selStore=n;document.querySelector('nav button[data-t="store"]').click()}
+function renderStore(S,P){if(!selStore||!S.st[selStore])selStore=S.rk[0];const d=S.st[selStore],s=d.s,p=P&&P.st[selStore]?P.st[selStore].s:null;
+ let h=`<div class="box"><label>店舗：<select id="ss">${Object.keys(AREAS).map(a=>`<optgroup label="${a}">${AREAS[a].filter(n=>S.st[n]).map(n=>`<option ${n==selStore?"selected":""}>${n}</option>`).join("")}</optgroup>`).join("")}</select></label></div>`;
+ h+=`<div class="cards"><div class="card"><small>総合</small><b>${s[0]}点</b><small>ブランド平均 ${f1(S.av[0])} / 前回比 ${diff(s[0],p&&p[0])}</small></div><div class="card"><small>ブランド順位（総合）</small><b>${S.inR[selStore]}位</b><small>/${S.names.length}店舗${p?` ／ 前回 ${P.inR[selStore]}位`:""}</small></div><div class="card"><small>回答率</small><b>${s[2]}%</b><small>ブランド平均 ${f1(S.av[2])}%</small></div></div>`;
+ h+=`<div class="box"><h3>項目別スコア</h3>${legend}<div class="tw sk1"><table class="dt"><tr><th style="width:110px">項目</th><th style="width:60px">自店舗</th><th>スコア（｜＝ブランド平均）</th><th style="width:80px">ブランド平均</th><th style="width:60px">平均差</th><th style="width:70px">ブランド順位</th>${p?`<th style="width:60px">前回</th><th style="width:60px">前回比</th>`:""}</tr>${ITEMS.map((t,i)=>{const k=i+3,v=s[k],a=S.av[k],rk=S.rankBy(k)[selStore],c=v-a<=-5?"#f08a4b":v<a?"#f2c94c":v-a>=5?"#2e9e5b":"#5b8def";return`<tr><td class="n"><b>${QI(t)}</b></td><td class="${cls(v,a)}" style="font-size:15px"><b>${v}</b></td><td><div class="bar"><div style="width:${v}%;background:${c}"></div><i style="left:${a}%"></i></div></td><td>${f1(a)}</td><td>${diff(v,a)}</td><td>${rk}位</td>${p?`<td>${p[k]}</td><td>${diff(v,p[k])}</td>`:""}</tr>`}).join("")}</table></div></div>`;
+ h+=`<div class="box"><h3>愛されMVP</h3><div class="mvp">${d.l.map((m,i)=>`<div><b>${i+1}位 ${m[0]}</b>（${m[1]}票）</div>`).join("")}</div></div><div class="box"><h3>リーダーシップMVP</h3><div class="mvp">${d.L.map((m,i)=>`<div><b>${i+1}位 ${m[0]}</b>（${m[1]}票）<ul>${m[2].split("／").map(c=>`<li>${c}</li>`).join("")}</ul></div>`).join("")}</div></div>`;
+ $("store").innerHTML=h;$("ss").onchange=e=>{selStore=e.target.value;render()}}
+let TH=5;
+function renderTend(S,P){const el=$("tend");if(!P){el.innerHTML='<div class="box">比較月を選択してください。</div>';return}
+ const IK=[0,...ITEMS.map((_,i)=>i+3)],ups=[],dns=[];
+ S.names.forEach(n=>{if(!P.st[n])return;const s=S.st[n].s,p=P.st[n].s;IK.forEach(i=>{const d=s[i]-p[i];if(Math.abs(d)>=TH)(d>0?ups:dns).push({n,a:areaOf(n),it:LAB(i),p:p[i],v:s[i],d})})});
+ ups.sort((a,b)=>b.d-a.d);dns.sort((a,b)=>a.d-b.d);
+ const cnt=(L,k)=>{const o={};L.forEach(x=>o[x[k]]=(o[x[k]]||0)+1);return Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,5).map(x=>`${x[0]}（${x[1]}）`).join("、")||"-"};
+ const tbl=(L,c)=>L.length?`<div class="tw sk1"><table><tr><th>店舗</th><th>エリア</th><th>項目</th><th>${cmpM()}</th><th>${cur()}</th><th>増減</th></tr>${L.map((x,i)=>`<tr class="${i>=25?"px":""}"><td class="n">${x.n}</td><td>${x.a.replace("エリア","")}</td><td>${QI(x.it)}</td><td>${x.p}</td><td>${x.v}</td><td class="${c}"><b>${x.d>0?"▲":"▼"}${Math.abs(x.d)}</b></td></tr>`).join("")}</table></div>${L.length>25?`<div class="note ponly">※PDFは上位25件を表示（他${L.length-25}件は画面で確認）</div>`:""}`:'<div class="note">該当なし</div>';
+ el.innerHTML=`<div class="box"><h3>傾向（${cmpM()} → ${cur()}）</h3><label>ピックアップ基準：±<select id="th">${[3,5,8,10].map(v=>`<option ${v==TH?"selected":""}>${v}</option>`).join("")}</select>pt以上</label>
+ <div class="tw sk1" style="margin-top:8px"><table><tr><th>ブランド平均</th>${IK.map(k=>`<th>${LQ(k)}</th>`).join("")}</tr><tr><td>${cmpM()}</td>${IK.map(k=>`<td>${f1(P.av[k])}</td>`).join("")}</tr><tr><td>${cur()}</td>${IK.map(k=>`<td>${f1(S.av[k])}</td>`).join("")}</tr><tr><td>増減</td>${IK.map(k=>{const d=S.av[k]-P.av[k];return`<td class="${d>0?"up":d<0?"dn":""}"><b>${d>0?"▲":d<0?"▼":"±"}${f1(Math.abs(d))}</b></td>`}).join("")}</tr></table></div></div>
+ <div class="grid"><div class="box"><h3 style="border-color:#0a7a3d">上昇ピックアップ（${ups.length}件）</h3><div class="note">店舗別件数：${cnt(ups,"n")}<br>項目別件数：${cnt(ups,"it")}</div>${tbl(ups,"up")}</div>
+ <div class="box"><h3 style="border-color:#c62828">減少ピックアップ（${dns.length}件）</h3><div class="note">店舗別件数：${cnt(dns,"n")}<br>項目別件数：${cnt(dns,"it")}</div>${tbl(dns,"dn")}</div></div>
+ <div class="note">回答率は対象外。比較月にデータがない店舗は除外。</div>`;$("th").onchange=e=>{TH=+e.target.value;renderTend(S,P)}}
+let trendItem=0;
+function renderTrend(){const all=[...new Set(months.flatMap(m=>Object.keys(DATA[m].stores)))],SS=months.map(stats);
+ let h=`<div class="box"><h3>月別推移（${LQ(trendItem)}）</h3><label>指標：<select id="ti">${KEYS.map(k=>`<option value="${k}" ${k==trendItem?"selected":""}>${LAB(k)}</option>`).join("")}</select></label>
+ <div class="tw sk" style="margin-top:8px"><table><tr><th>エリア</th><th>店舗</th>${months.map(m=>`<th>${m}<br><small>値／ブランド順位</small></th>`).join("")}<th>初回→最新</th></tr>
+ <tr class="avg"><td colspan="2">ブランド平均</td>${SS.map(S=>`<td>${f1(S.av[trendItem])}</td>`).join("")}<td>${months.length>1?diff(SS.at(-1).av[trendItem],SS[0].av[trendItem]):"-"}</td></tr>`;
+ Object.keys(AREAS).forEach(a=>AREAS[a].filter(n=>all.includes(n)).forEach(n=>{const vals=months.map(m=>DATA[m].stores[n]?DATA[m].stores[n].s[trendItem]:null),k=vals.filter(v=>v!=null);
+  h+=`<tr><td>${a.replace("エリア","")}</td><td class="n">${n}</td>${vals.map((v,j)=>`<td class="${v==null?"":cls(v,SS[j].av[trendItem])}">${v==null?"-":`<b>${v}</b> <small>(${SS[j].rankBy(trendItem)[n]}位)</small>`}${j>0&&v!=null?"<br><small>"+diff(v,vals[j-1])+"</small>":""}</td>`).join("")}<td>${k.length>1?diff(k.at(-1),k[0]):"-"}</td></tr>`}));
+ $("trend").innerHTML=h+`</table></div></div>`;$("ti").onchange=e=>{trendItem=+e.target.value;renderTrend()}}
+
+let arKey=0;
+function renderARank(S,P){const IK=[0,...ITEMS.map((_,i)=>i+3)];
+ const calc=(X,k)=>{const r=[];Object.keys(AREAS).forEach(a=>{const g=AREAS[a].filter(n=>X.st[n]);if(g.length)r.push({a,g,v:avg(g.map(n=>X.st[n].s[k]))})});r.sort((x,y)=>y.v-x.v);r.forEach(x=>x.r=1+r.filter(y=>y.v>x.v+1e-9).length);return r};
+ const R=calc(S,arKey),PR=P?calc(P,arKey):[],pm={};PR.forEach(x=>pm[x.a]=x);const av=S.av[arKey];
+ const mx=Math.max(...R.map(x=>x.v)),mn=Math.min(...R.map(x=>x.v)),lo=Math.max(0,Math.floor(mn-8));
+ let h=`<div class="box"><h3>エリアランキング（${cur()}${P?` ／ 比較：${cmpM()}`:""}）</h3><div class="chips">${IK.map(k=>`<button class="${k==arKey?"on":""}" onclick="arKey=${k};render()">${LQ(k)}</button>`).join("")}</div>
+ <div class="tw sk1"><table><tr><th>順位</th><th>エリア</th><th>${LQ(arKey)}平均</th><th style="min-width:120px">スコア（｜＝ブランド平均）</th><th>ブランド平均差</th>${P?"<th>前回</th><th>前回比</th><th>前回順位</th>":""}<th>店舗内訳（${LAB(arKey)}）</th></tr>`;
+ R.forEach(x=>{const p=pm[x.a],w=(v)=>((v-lo)/(100-lo)*100).toFixed(1),c=x.v-av>=0?"#2e9e5b":"#f08a4b";
+  const mem=[...x.g].sort((a,b)=>S.st[b].s[arKey]-S.st[a].s[arKey]).map(n=>{const v=S.st[n].s[arKey];return`<span class="${cls(v,av)}" style="padding:0 3px;border-radius:3px">${n.replace("焼売のジョー","")} ${v}</span>`}).join("　");
+  h+=`<tr class="${x.r==1?"rk1":""}"><td><span class="medal ${x.r<=3?"m"+x.r:""}">${x.r}</span></td><td class="n"><b>${x.a}</b><br><small>${x.g.length}店舗</small></td><td style="font-size:16px"><b>${f1(x.v)}</b></td><td><div class="bar"><div style="width:${w(x.v)}%;background:${c}"></div><i style="left:${w(av)}%"></i></div></td><td>${diff(x.v,av)}</td>${P?`<td>${p?f1(p.v):"-"}</td><td>${p?diff(x.v,p.v):"-"}</td><td>${p?`${p.r}位 ${p.r>x.r?'<span class="up">↑</span>':p.r<x.r?'<span class="dn">↓</span>':"→"}`:"-"}</td>`:""}<td class="mem">${mem}</td></tr>`});
+ h+=`</table></div><div class="note">エリア平均＝担当エリア内の登録店舗の単純平均。ブランド平均 ${f1(av)}${arKey==2?"%":""}。項目ボタンで切り替え。</div></div>`;
+ const all=IK.map(k=>calc(S,k)),cell=(k,a)=>{const r=all[IK.indexOf(k)].find(x=>x.a==a);return r?`<td class="${r.r==1?"hi":""}">${r.r}位<br><small>${f1(r.v)}</small></td>`:"<td>-</td>"};
+ h+=`<div class="box"><h3>項目別エリア順位一覧</h3><div class="tw sk1"><table><tr><th>エリア</th>${IK.map(k=>`<th>${LQ(k)}</th>`).join("")}</tr>${R.map(x=>`<tr><td class="n"><b>${x.a}</b></td>${IK.map(k=>cell(k,x.a)).join("")}</tr>`).join("")}</table></div></div>`;
+ $("arank").innerHTML=h}
+
+const TABS=["sum","area","store","tend","trend","arank"];
+const TN={sum:"全体サマリー",area:"エリア別",store:"店舗詳細",tend:"傾向",trend:"推移比較",arank:"エリアランキング"};
+const ORI={store:"P"};
+const curTab=()=>document.querySelector("nav button.on").dataset.t;
+const PG={L:[1020,660],P:[700,985]};
+function printTabs(list){hideQ();render();document.body.classList.add("pm");
+ list.forEach(id=>{const el=$(id),o=ORI[id]||"L",[W,H]=PG[o];el.dataset.o=o;el.classList.add("pr");
+  const sub=id=="store"?selStore:id=="trend"?"指標："+LAB(trendItem):id=="arank"?"項目："+LAB(arKey):id=="tend"?`${cmpM()}→${cur()}／基準±${TH}pt`:"";
+  el.insertAdjacentHTML("afterbegin",`<div class="ph"><b>カンテラゲージ（ES） ${TN[id]}${sub?"　"+sub:""}</b><span>対象：${cur()}${cmpM()?"／比較："+cmpM():""}</span></div>`);
+  el.querySelectorAll("label").forEach(l=>{if(l.querySelector("select"))l.classList.add("noprint")});
+  el.style.zoom=1;el.style.width=W+"px";let z=1;
+  for(let k=0;k<4;k++){const sw=Math.max(el.scrollWidth,W),w=parseFloat(el.style.width);if(sw>w){el.style.width=sw+"px"}
+   const ww=parseFloat(el.style.width),h=el.scrollHeight;z=Math.min(1,W/ww,H/h);
+   const tw=W/z;if(Math.abs(tw-ww)<4)break;el.style.width=Math.max(W,Math.min(tw,W/0.5))+"px"}
+  z=Math.min(1,W/parseFloat(el.style.width),H/el.scrollHeight);if(z>=1){let u=Math.min(1.3,W/680,H/el.scrollHeight);el.style.width=(W/u)+"px";for(let k=0;k<3;k++){u=Math.min(1.3,W/680,H/el.scrollHeight,W/Math.max(el.scrollWidth,W/u));el.style.width=(W/u)+"px"}z=Math.min(u,H/el.scrollHeight)*0.99}el.style.zoom=Math.max(z,0.5).toFixed(3)});
+ setTimeout(()=>window.print(),80)}
+window.addEventListener("afterprint",()=>{document.body.classList.remove("pm");TABS.forEach(id=>{const el=$(id);el.classList.remove("pr");el.style.zoom="";el.style.width="";el.removeAttribute("data-o")});render()});
+function render(){const S=stats(cur()),P=cmpM()?stats(cmpM()):null;renderSum(S,P);renderArea(S,P);renderStore(S,P);renderTend(S,P);renderTrend();renderARank(S,P)}
+months.forEach(m=>$("month").add(new Option(m,m)));$("month").value=months.at(-1);
+function fillCmp(){const c=$("cmp");c.innerHTML="";c.add(new Option("なし",""));months.filter(m=>m<cur()).reverse().forEach(m=>c.add(new Option(m,m)));if(c.options.length>1)c.selectedIndex=1}
+fillCmp();$("month").onchange=()=>{fillCmp();render()};$("cmp").onchange=render;
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button,.sec").forEach(e=>e.classList.remove("on"));b.classList.add("on");$(b.dataset.t).classList.add("on")});
+render();
+</script></body></html>
